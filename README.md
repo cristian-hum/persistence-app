@@ -1,2 +1,2 @@
 # persistence-app
-learn to link to a SQL DB
+learn to link spring project to a SQL DB
