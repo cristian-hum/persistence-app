@@ -1,0 +1,7 @@
+# DONE: load the mysql db properties from here
+jdbc:
+  url: jdbc:mysql://localhost:3306/book_list
+  username: root
+  password: root
+
+version: 1.0

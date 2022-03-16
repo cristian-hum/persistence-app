@@ -1,0 +1,16 @@
+.gradle
+!gradle/wrapper/gradle-wrapper.jar
+
+*/target/
+*/*/target/
+*/out/
+*/*/out/
+*/log/
+*/*/log/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
