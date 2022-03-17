@@ -8,14 +8,24 @@ import java.io.IOException;
 
 public class PropertiesLoader {
 
-    public ApplicationProperties loadProperties() throws IOException {
-        // TODO: use jackson to load properties from yml
+    public static ApplicationProperties loadProperties() {
+        // COMPLETED : use jackson to load properties from yml
         // YML factory
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
 
-        return mapper.readValue(new File("src/main/resources/application.yml"), ApplicationProperties.class);
+        ApplicationProperties ap = null;
+
+        {
+            try {
+                ap = mapper.readValue(new File("src/main/resources/application.yml"), ApplicationProperties.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return ap;
     }
 
 }
