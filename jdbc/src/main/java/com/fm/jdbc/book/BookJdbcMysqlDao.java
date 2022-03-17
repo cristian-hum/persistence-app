@@ -1,5 +1,8 @@
 package com.fm.jdbc.book;
 
+import com.fm.jdbc.util.ApplicationProperties;
+import com.fm.jdbc.util.PropertiesLoader;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,17 +14,18 @@ import java.util.Optional;
 // use try with resources
 public class BookJdbcMysqlDao implements BookRepository {
 
+    ApplicationProperties ap = PropertiesLoader.loadProperties();
 
     @Override
     public Book create(Book book) {
-//        try (final Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/database-name",
-//                "my-username", "my-secret-pw");) {
-//            // use Connection object here
-//        } catch (
-//                SQLException e) {
-//            e.printStackTrace();
-//            // exception handling
-//        }
+        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());) {
+            // use Connection object here
+            if (connection != null) {
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return null;
     }
