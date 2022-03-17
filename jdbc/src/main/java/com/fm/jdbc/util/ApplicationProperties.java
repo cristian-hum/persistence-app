@@ -1,5 +1,11 @@
 package com.fm.jdbc.util;
 
-public class ApplicationProperties {
+import lombok.Data;
 
+@Data
+public class ApplicationProperties {
+    private String url;
+    private String username;
+    private String password;
+    private boolean createDatabaseIfNotExist;
 }

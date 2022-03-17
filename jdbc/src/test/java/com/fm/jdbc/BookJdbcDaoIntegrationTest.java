@@ -1,5 +1,7 @@
 package com.fm.jdbc;
 
+import org.junit.Test;
+
 // TODO: implement this as an integration test
 // both implementations should work
 class BookJdbcDaoIntegrationTest {
