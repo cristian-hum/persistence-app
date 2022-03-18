@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// TODO: implement this using jdbc prepared statements
+//TODO: implement this using jdbc prepared statements
 // use a mysql database
 // use try with resources
 public class BookJdbcMysqlDao implements BookRepository {
@@ -18,8 +18,8 @@ public class BookJdbcMysqlDao implements BookRepository {
     ApplicationProperties ap = PropertiesLoader.loadProperties();
     String tableName = "books";
     String createString = "INSERT INTO books SET title=?, author=?, publishDate=?";
-    String updateString = "";
-    String deleteString = "";
+    String updateString = "UPDATE books title=?, author=?, publishDate=? WHERE id=?";
+    String deleteString = "DELETE FROM books WHERE id=?";
     String findAllString = "SELECT * FROM books";
     String findByString = "SELECT * FROM books WHERE ?=?";
 
@@ -37,7 +37,7 @@ public class BookJdbcMysqlDao implements BookRepository {
                 int result = createStatement.executeUpdate();
 
                 if (result == 0) {
-                    throw new SQLException("Creating user failed, no rows affected.");
+                    throw new SQLException("Creating book failed, no rows affected.");
                 }
 
                 try (ResultSet generatedKeys = createStatement.getGeneratedKeys()) {
@@ -92,7 +92,7 @@ public class BookJdbcMysqlDao implements BookRepository {
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet == null) {
-                    throw new SQLException("No records found in DB for the author "+author+"!");
+                    throw new SQLException("No records found in DB for the author " + author + "!");
                 }
 
                 while (resultSet.next()) {
@@ -118,10 +118,10 @@ public class BookJdbcMysqlDao implements BookRepository {
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet == null) {
-                    throw new SQLException("No records found in DB for the id "+id+"!");
+                    throw new SQLException("No records found in DB for the id " + id + "!");
                 }
 
-                if(resultSet.next()){
+                if (resultSet.next()) {
                     result = Optional.ofNullable(getBook(resultSet));
                 }
             }
@@ -133,17 +133,72 @@ public class BookJdbcMysqlDao implements BookRepository {
 
     @Override
     public Optional<Book> findByTitle(String title) {
-        return Optional.empty();
+        Optional<Book> result = null;
+        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+             PreparedStatement statement = connection.prepareStatement(findByString);
+        ) {
+            if (connection != null) {
+                statement.setString(1, "title");
+                statement.setString(2, title);
+                ResultSet resultSet = statement.executeQuery();
+
+                if (resultSet == null) {
+                    throw new SQLException("No records found in DB for the title " + title + "!");
+                }
+
+                if (resultSet.next()) {
+                    result = Optional.ofNullable(getBook(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     @Override
     public Book update(Long id, Book book) {
-        return null;
+        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+             PreparedStatement statement = connection.prepareStatement(updateString);
+        ) {
+            if (connection != null) {
+                statement.setString(1, book.getTitle());
+                statement.setString(2, book.getAuthor());
+                statement.setObject(3, book.getPublishDate());
+                statement.setLong(4, id);
+
+                //TODO validate if using SQL to send the error is better that checking if the user exists and then updating
+                int result = statement.executeUpdate();
+
+                if (result == 0) {
+                    throw new SQLException("Updating user failed, no rows affected.");
+                }
+
+                book.setId(id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return book;
     }
 
     @Override
     public void delete(Long id) {
+        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+             PreparedStatement statement = connection.prepareStatement(deleteString);
+        ) {
+            if (connection != null) {
+                statement.setLong(1, id);
 
+                int result = statement.executeUpdate();
+
+                if (result == 0) {
+                    throw new SQLException("Deleting user failed, no rows affected.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private Book getBook(ResultSet resultSet) throws SQLException {
