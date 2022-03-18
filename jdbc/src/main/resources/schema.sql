@@ -1,5 +1,5 @@
 -- TODO: save all db objects here
-CREATE TABLE book(
+CREATE TABLE books(
                           ID BIGINT NOT NULL AUTO_INCREMENT,
                           title VARCHAR(255),
                           author VARCHAR(255),
@@ -7,4 +7,4 @@ CREATE TABLE book(
                           PRIMARY KEY (`ID`)
 );
 
-insert into book values (1, "LOTR", "JRR Tolkien", )
+insert into books values (1, "LOTR", "JRR Tolkien", )

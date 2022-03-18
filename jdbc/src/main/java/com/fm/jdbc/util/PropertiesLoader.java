@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 public class PropertiesLoader {
 
@@ -17,13 +18,16 @@ public class PropertiesLoader {
 
         ApplicationProperties ap = null;
 
+        Map<String, ApplicationProperties> jsonMap = null;
         {
             try {
-                ap = mapper.readValue(new File("src/main/resources/application.yml"), ApplicationProperties.class);
+                jsonMap = mapper.readValue(new File("src/main/resources/application.yml"), Map.class);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
+        ap = jsonMap.get("jdbc");
 
         return ap;
     }
