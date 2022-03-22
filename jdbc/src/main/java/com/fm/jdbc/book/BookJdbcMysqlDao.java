@@ -18,10 +18,15 @@ public class BookJdbcMysqlDao implements BookRepository {
     ApplicationProperties ap = PropertiesLoader.loadProperties();
     String tableName = "books";
     String createString = "INSERT INTO books SET title=?, author=?, publishDate=?";
-    String updateString = "UPDATE books title=?, author=?, publishDate=? WHERE id=?";
+    String updateString = "UPDATE books SET title=?, author=?, publishDate=? WHERE id=?";
     String deleteString = "DELETE FROM books WHERE id=?";
     String findAllString = "SELECT * FROM books";
-    String findByString = "SELECT * FROM books WHERE ?=?";
+
+    String findByString = "";
+    private String personaliseFindByString(String findParam) {
+        return "SELECT * FROM books WHERE " + findParam + "=?";
+    }
+
 
     @Override
     public Book create(Book book) {
@@ -84,11 +89,10 @@ public class BookJdbcMysqlDao implements BookRepository {
     public List<Book> findByAuthor(String author) {
         List<Book> result = new ArrayList<>();
         try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
-             PreparedStatement statement = connection.prepareStatement(findByString);
+             PreparedStatement statement = connection.prepareStatement(personaliseFindByString("author"));
         ) {
             if (connection != null) {
-                statement.setString(1, "author");
-                statement.setString(2, author);
+                statement.setString(1, author);
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet == null) {
@@ -110,11 +114,10 @@ public class BookJdbcMysqlDao implements BookRepository {
     public Optional<Book> findById(Long id) {
         Optional<Book> result = null;
         try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
-             PreparedStatement statement = connection.prepareStatement(findByString);
+             PreparedStatement statement = connection.prepareStatement(personaliseFindByString("id"));
         ) {
             if (connection != null) {
-                statement.setString(1, "id");
-                statement.setLong(2, id);
+                statement.setLong(1, id);
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet == null) {
@@ -135,11 +138,10 @@ public class BookJdbcMysqlDao implements BookRepository {
     public Optional<Book> findByTitle(String title) {
         Optional<Book> result = null;
         try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
-             PreparedStatement statement = connection.prepareStatement(findByString);
+             PreparedStatement statement = connection.prepareStatement(personaliseFindByString("title"));
         ) {
             if (connection != null) {
-                statement.setString(1, "title");
-                statement.setString(2, title);
+                statement.setString(1, title);
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet == null) {
@@ -205,7 +207,7 @@ public class BookJdbcMysqlDao implements BookRepository {
         Long id = resultSet.getLong("id");
         String title = resultSet.getString("title");
         String author = resultSet.getString("author");
-        LocalDate publishDate = (LocalDate) resultSet.getObject("publishDate");
+        LocalDate publishDate = resultSet.getObject("publishDate", LocalDate.class);
 
         Book book = new Book(id, title, author, publishDate);
         return book;

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class PropertiesLoader {
@@ -16,18 +17,21 @@ public class PropertiesLoader {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
 
-        ApplicationProperties ap = null;
+        ApplicationProperties ap = new ApplicationProperties();
 
-        Map<String, ApplicationProperties> jsonMap = null;
-        {
-            try {
-                jsonMap = mapper.readValue(new File("src/main/resources/application.yml"), Map.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        File file = new File(classLoader.getResource("application.yml").getFile());
+
+        Map<String, Map<String, String>> jsonMap = null;
+        try {
+            jsonMap = mapper.readValue(file, Map.class);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        ap = jsonMap.get("jdbc");
+        ap.setUrl(jsonMap.get("jdbc").get("url"));
+        ap.setUsername(jsonMap.get("jdbc").get("username"));
+        ap.setPassword(jsonMap.get("jdbc").get("password"));
 
         return ap;
     }

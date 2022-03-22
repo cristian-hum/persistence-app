@@ -1,8 +1,10 @@
 -- COMPLETED: save all db objects here
-# drop schema book_list;
+
+DROP SCHEMA book_list;
 
 CREATE SCHEMA IF NOT EXISTS book_list;
 USE book_list;
+
 CREATE TABLE books(
                       ID BIGINT NOT NULL AUTO_INCREMENT,
                       title VARCHAR(255),
@@ -10,5 +12,6 @@ CREATE TABLE books(
                       publishDate date,
                       PRIMARY KEY (`ID`)
 );
+
 insert into books values (1, "LOTR", "JRR Tolkien", null);
 insert into books values (2, "The caves of steel", "Asimov", null);

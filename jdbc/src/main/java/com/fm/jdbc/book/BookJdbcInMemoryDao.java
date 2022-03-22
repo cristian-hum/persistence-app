@@ -48,8 +48,10 @@ public class BookJdbcInMemoryDao implements BookRepository {
 
     @Override
     public Book update(Long id, Book book) {
-        db.replace(id, book);
-        return book;
+        db.get(id).setTitle(book.getTitle());
+        db.get(id).setAuthor(book.getAuthor());
+        db.get(id).setPublishDate(book.getPublishDate());
+        return db.get(id);
     }
 
     @Override

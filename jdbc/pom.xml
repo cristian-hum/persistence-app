@@ -37,12 +37,14 @@
             <version>${jackson.version}</version>
         </dependency>
 
+
+        <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.7</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -61,7 +63,14 @@
             <version>RELEASE</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13.2</version>
+        <scope>test</scope>
+    </dependency>
     </dependencies>
+
 
 
 
