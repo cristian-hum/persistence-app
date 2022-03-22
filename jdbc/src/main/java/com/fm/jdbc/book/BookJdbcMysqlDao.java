@@ -23,6 +23,7 @@ public class BookJdbcMysqlDao implements BookRepository {
     String findAllString = "SELECT * FROM books";
 
     String findByString = "";
+
     private String personaliseFindByString(String findParam) {
         return "SELECT * FROM books WHERE " + findParam + "=?";
     }
@@ -120,13 +121,12 @@ public class BookJdbcMysqlDao implements BookRepository {
                 statement.setLong(1, id);
                 ResultSet resultSet = statement.executeQuery();
 
-                if (resultSet == null) {
-                    throw new SQLException("No records found in DB for the id " + id + "!");
-                }
+//                if (resultSet == null) {
+//                    throw new SQLException("No records found in DB for the id " + id + "!");
+//                }
 
-                if (resultSet.next()) {
-                    result = Optional.ofNullable(getBook(resultSet));
-                }
+                resultSet.next();
+                result = Optional.of(getBook(resultSet));
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -2,6 +2,7 @@ package com.fm.jdbc;
 
 import com.fm.jdbc.book.Book;
 import com.fm.jdbc.book.BookJdbcInMemoryDao;
+import com.fm.jdbc.book.BookJdbcMysqlDao;
 import com.fm.jdbc.book.BookRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 // both implementations should work
 class BookJdbcDaoIntegrationTest {
 
-//        private static final BookRepository bookRepository = new BookJdbcMysqlDao();
-    private static final BookRepository bookRepository = new BookJdbcInMemoryDao();
+    private static final BookRepository bookRepository = new BookJdbcMysqlDao();
+//    private static final BookRepository bookRepository = new BookJdbcInMemoryDao();
 
     //   add some junk in the db
     @BeforeAll
@@ -65,43 +66,47 @@ class BookJdbcDaoIntegrationTest {
 
     @Test
     void findByAuthor() {
-        //given - multiple objects in db - @BeforeAll populated db & @Test create()
+        //given - a new object in the DB, with a certain author
+        String author = bookRepository.create(new Book(null, "title", "Johny", LocalDate.of(2020, 1, 1))).getAuthor();
 
         //when - you use the findByAuthor method from the repository
-        List<Book> foundBooksWithAuthor = bookRepository.findByAuthor("author1");
+        List<Book> foundBooksWithAuthor = bookRepository.findByAuthor(author);
 
         //then - you get the list of books, with 1 result in it
         assertAll(
-                () -> Assertions.assertEquals(1, foundBooksWithAuthor.size()),
-                () -> Assertions.assertEquals("author1", foundBooksWithAuthor.get(0).getAuthor())
+                () -> Assertions.assertEquals(author, foundBooksWithAuthor.get(0).getAuthor())
         );
     }
 
     @Test
     void findById() {
-        //given - multiple objects in db - @BeforeAll populated db & @Test create()
+        //given - a new object in the DB, with a certain ID
+        Long id = bookRepository.create(new Book(null, "title", "author", LocalDate.of(2020, 1, 1))).getId();
+
 
         //when - you use the findByAuthor method from the repository
-        Optional<Book> foundBooksWithId = bookRepository.findById(1L);
+        Optional<Book> foundBooksWithId = bookRepository.findById(id);
 
         //then - you get the list of books, with 1 result in it
         assertAll(
                 () -> Assertions.assertTrue(foundBooksWithId.isPresent()),
-                () -> Assertions.assertEquals(1L, foundBooksWithId.get().getId())
+                () -> Assertions.assertEquals(id, foundBooksWithId.get().getId())
         );
     }
 
     @Test
     void findByTitle() {
-        //given - multiple objects in db - @BeforeAll populated db & @Test create()
+        //given - - a new object in the DB, with a certain title
+        String title = bookRepository.create(new Book(null, "title", "Johny", LocalDate.of(2020, 1, 1))).getTitle();
+
 
         //when - you use the findByAuthor method from the repository
-        Optional<Book> foundBooksWithTitle = bookRepository.findByTitle("title1");
+        Optional<Book> foundBooksWithTitle = bookRepository.findByTitle(title);
 
         //then - you get the list of books, with 1 result in it
         assertAll(
                 () -> Assertions.assertTrue(foundBooksWithTitle.isPresent()),
-                () -> Assertions.assertEquals("title1", foundBooksWithTitle.get().getTitle())
+                () -> Assertions.assertEquals(title, foundBooksWithTitle.get().getTitle())
         );
     }
 
@@ -136,7 +141,7 @@ class BookJdbcDaoIntegrationTest {
         bookRepository.delete(validId);
 
         //then - the db no longer has that entry
-        assertFalse(bookRepository.findById(validId).isPresent());
+        assertTrue(bookRepository.findById(validId).isEmpty());
     }
 
 }
