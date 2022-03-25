@@ -4,17 +4,15 @@ import com.fm.jdbc.book.Book;
 import com.fm.jdbc.book.BookJdbcInMemoryDao;
 import com.fm.jdbc.book.BookRepository;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-
-//import org.junit.Assert;
-//import org.junit.Test;
 
 // COMPLETED: implement this as an integration test
 // both implementations should work
@@ -23,29 +21,29 @@ class BookJdbcDaoIntegrationTest {
 //        private static final BookRepository bookRepository = new BookJdbcMysqlDao();
     private static final BookRepository bookRepository = new BookJdbcInMemoryDao();
 
-    //   add some junk in the db
-    @BeforeAll
-    static void populateDB() {
-        Book book1 = new Book(null, "title1", "author1", LocalDate.of(2020, 1, 1));
-        Book book2 = new Book(null, "title2", "author2", LocalDate.of(2020, 1, 2));
-        Book book3 = new Book(null, "title3", "author3", LocalDate.of(2020, 1, 3));
-        bookRepository.create(book1);
-        bookRepository.create(book2);
-        bookRepository.create(book3);
+    @BeforeEach
+    void setUp() {
+        bookRepository.findAll()
+                .forEach(book -> bookRepository.delete(book.getId()));
     }
 
     @Test
-    void create() {
-        //given - a book
+    void whenCreate_shouldReturnABook() {
+        // given
         Book book = new Book(null, "title", "author", LocalDate.of(2020, 1, 1));
-        //when - you call the create method
-        Book result = bookRepository.create(book);
-        //then - db adds the book, method returns book with new id
+
+        // when
+
+        Book actualBook = bookRepository.create(book);
+
+        // then
+        assertThat(actualBook.getTitle()).isEqualTo(book.getTitle());
+
         assertAll(
-                () -> Assertions.assertNotNull(result.getId(), "ID null => fail"),
-                () -> Assertions.assertEquals(result.getAuthor(), book.getAuthor(), "Book author property not persisted"),
-                () -> Assertions.assertEquals(book.getTitle(), result.getTitle(), "Book title property not persisted"),
-                () -> Assertions.assertEquals(book.getPublishDate(), result.getPublishDate(), "Book publishDate property not persisted")
+                () -> Assertions.assertNotNull(actualBook.getId(), "ID null => fail"),
+                () -> Assertions.assertEquals(actualBook.getAuthor(), book.getAuthor(), "Book author property not persisted"),
+                () -> Assertions.assertEquals(book.getTitle(), actualBook.getTitle(), "Book title property not persisted"),
+                () -> Assertions.assertEquals(book.getPublishDate(), actualBook.getPublishDate(), "Book publishDate property not persisted")
         );
     }
 
@@ -57,7 +55,7 @@ class BookJdbcDaoIntegrationTest {
         List<Book> foundBooks = bookRepository.findAll();
 
         //then - you get the list of books
-        assertFalse(foundBooks.isEmpty());
+        assertThat(foundBooks).isEmpty();
 
         //TODO ? test method does not check if the total number of results is the same, or the validity of the data
     }

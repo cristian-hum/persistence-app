@@ -15,45 +15,39 @@ import java.util.Optional;
 // use try with resources
 public class BookJdbcMysqlDao implements BookRepository {
 
-    //Variables Preparation Area
-    ApplicationProperties properties = PropertiesLoader.loadProperties();
-    JdbcProperties jdbcProperties = properties.getJdbcProperties();
-    
-    String tableName = "books";
-    String createString = "INSERT INTO books SET title=?, author=?, publishDate=?";
-    String updateString = "UPDATE books title=?, author=?, publishDate=? WHERE id=?";
-    String deleteString = "DELETE FROM books WHERE id=?";
-    String findAllString = "SELECT * FROM books";
-    String findByString = "SELECT * FROM books WHERE ?=?";
+    private final ApplicationProperties properties = PropertiesLoader.loadProperties();
+    private final JdbcProperties jdbcProperties = properties.getJdbcProperties();
+
+    private static final String updateString = "UPDATE books title=?, author=?, publishDate=? WHERE id=?";
+    private static final String deleteString = "DELETE FROM books WHERE id=?";
+    private static final String findAllString = "SELECT * FROM books";
+    private static final String findByString = "SELECT * FROM books WHERE ?=?";
 
     @Override
     public Book create(Book book) {
-        
-        try (final Connection connection = DriverManager.getConnection(jdbcProperties.getUrl(), jdbcProperties.getUsername(), jdbcProperties.getPassword());
-             PreparedStatement createStatement = connection.prepareStatement(createString, Statement.RETURN_GENERATED_KEYS);
+        String INSERT_BOOK = "INSERT INTO books SET title=?, author=?, publishDate=?";
+
+        try (Connection connection = DriverManager.getConnection(jdbcProperties.getUrl(), jdbcProperties.getUsername(), jdbcProperties.getPassword());
+             PreparedStatement statement = connection.prepareStatement(INSERT_BOOK, Statement.RETURN_GENERATED_KEYS);
         ) {
-            if (connection != null) {
-                //using prepared statements protects against SQL injection attacks
-                createStatement.setString(1, book.getTitle());
-                createStatement.setString(2, book.getAuthor());
-                createStatement.setObject(3, book.getPublishDate());
+            statement.setString(1, book.getTitle());
+            statement.setString(2, book.getAuthor());
+            statement.setObject(3, book.getPublishDate());
 
-                int result = createStatement.executeUpdate();
+            int result = statement.executeUpdate();
 
-                if (result == 0) {
-                    throw new SQLException("Creating book failed, no rows affected.");
-                }
+            if (result == 0) {
+                throw new SQLException("Creating book failed, no rows affected.");
+            }
 
-                try (ResultSet generatedKeys = createStatement.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        book.setId(generatedKeys.getLong(1));
-                    } else {
-                        throw new SQLException(("Creating book failed, no ID obtained!"));
-                    }
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    book.setId(generatedKeys.getLong(1));
+                } else {
+                    throw new SQLException(("Creating book failed, no ID obtained!"));
                 }
             }
         } catch (SQLException e) {
-            //TODO should I be more specific with the error thrown here?
             e.printStackTrace();
         }
 
@@ -209,9 +203,8 @@ public class BookJdbcMysqlDao implements BookRepository {
         Long id = resultSet.getLong("id");
         String title = resultSet.getString("title");
         String author = resultSet.getString("author");
-        LocalDate publishDate = (LocalDate) resultSet.getObject("publishDate");
+        LocalDate publishDate = resultSet.getDate("publishDate").toLocalDate();
 
-        Book book = new Book(id, title, author, publishDate);
-        return book;
+        return new Book(id, title, author, publishDate);
     }
 }

@@ -20,4 +20,7 @@
         <module>jdbc</module>
     </modules>
 
+    <dependencies>
+
+    </dependencies>
 </project>
