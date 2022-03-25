@@ -9,27 +9,24 @@ import java.util.Map;
 
 public class PropertiesLoader {
 
+    private PropertiesLoader() {}
+
     public static ApplicationProperties loadProperties() {
         // COMPLETED : use jackson to load properties from yml
         // YML factory
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.findAndRegisterModules();
 
-        ApplicationProperties ap = null;
+        ApplicationProperties properties = null;
 
-        Map<String, ApplicationProperties> jsonMap = null;
-        {
-            try {
-                jsonMap = mapper.readValue(new File("src/main/resources/application.yml"), Map.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            properties = mapper.readValue(new File("src/main/resources/application.yml"),
+                    ApplicationProperties.class);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        ap = jsonMap.get("jdbc");
-
-        return ap;
+        return properties;
     }
 
 }

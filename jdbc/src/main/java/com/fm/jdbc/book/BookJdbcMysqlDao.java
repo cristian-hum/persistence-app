@@ -1,6 +1,7 @@
 package com.fm.jdbc.book;
 
 import com.fm.jdbc.util.ApplicationProperties;
+import com.fm.jdbc.util.JdbcProperties;
 import com.fm.jdbc.util.PropertiesLoader;
 
 import java.sql.*;
@@ -15,7 +16,9 @@ import java.util.Optional;
 public class BookJdbcMysqlDao implements BookRepository {
 
     //Variables Preparation Area
-    ApplicationProperties ap = PropertiesLoader.loadProperties();
+    ApplicationProperties properties = PropertiesLoader.loadProperties();
+    JdbcProperties jdbcProperties = properties.getJdbcProperties();
+    
     String tableName = "books";
     String createString = "INSERT INTO books SET title=?, author=?, publishDate=?";
     String updateString = "UPDATE books title=?, author=?, publishDate=? WHERE id=?";
@@ -25,7 +28,8 @@ public class BookJdbcMysqlDao implements BookRepository {
 
     @Override
     public Book create(Book book) {
-        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+        
+        try (final Connection connection = DriverManager.getConnection(jdbcProperties.getUrl(), jdbcProperties.getUsername(), jdbcProperties.getPassword());
              PreparedStatement createStatement = connection.prepareStatement(createString, Statement.RETURN_GENERATED_KEYS);
         ) {
             if (connection != null) {
@@ -59,7 +63,7 @@ public class BookJdbcMysqlDao implements BookRepository {
     @Override
     public List<Book> findAll() {
         List<Book> result = new ArrayList<>();
-        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+        try (final Connection connection = DriverManager.getConnection(jdbcProperties.getUrl(), jdbcProperties.getUsername(), jdbcProperties.getPassword());
              PreparedStatement findAllStatement = connection.prepareStatement(findAllString);
         ) {
             if (connection != null) {
@@ -83,7 +87,7 @@ public class BookJdbcMysqlDao implements BookRepository {
     @Override
     public List<Book> findByAuthor(String author) {
         List<Book> result = new ArrayList<>();
-        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+        try (final Connection connection = DriverManager.getConnection(jdbcProperties.getUrl(), jdbcProperties.getUsername(), jdbcProperties.getPassword());
              PreparedStatement statement = connection.prepareStatement(findByString);
         ) {
             if (connection != null) {
@@ -109,7 +113,7 @@ public class BookJdbcMysqlDao implements BookRepository {
     @Override
     public Optional<Book> findById(Long id) {
         Optional<Book> result = null;
-        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+        try (final Connection connection = DriverManager.getConnection(jdbcProperties.getUrl(), jdbcProperties.getUsername(), jdbcProperties.getPassword());
              PreparedStatement statement = connection.prepareStatement(findByString);
         ) {
             if (connection != null) {
@@ -134,7 +138,7 @@ public class BookJdbcMysqlDao implements BookRepository {
     @Override
     public Optional<Book> findByTitle(String title) {
         Optional<Book> result = null;
-        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+        try (final Connection connection = DriverManager.getConnection(jdbcProperties.getUrl(), jdbcProperties.getUsername(), jdbcProperties.getPassword());
              PreparedStatement statement = connection.prepareStatement(findByString);
         ) {
             if (connection != null) {
@@ -158,7 +162,7 @@ public class BookJdbcMysqlDao implements BookRepository {
 
     @Override
     public Book update(Long id, Book book) {
-        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+        try (final Connection connection = DriverManager.getConnection(jdbcProperties.getUrl(), jdbcProperties.getUsername(), jdbcProperties.getPassword());
              PreparedStatement statement = connection.prepareStatement(updateString);
         ) {
             if (connection != null) {
@@ -184,7 +188,7 @@ public class BookJdbcMysqlDao implements BookRepository {
 
     @Override
     public void delete(Long id) {
-        try (final Connection connection = DriverManager.getConnection(ap.getUrl(), ap.getUsername(), ap.getPassword());
+        try (final Connection connection = DriverManager.getConnection(jdbcProperties.getUrl(), jdbcProperties.getUsername(), jdbcProperties.getPassword());
              PreparedStatement statement = connection.prepareStatement(deleteString);
         ) {
             if (connection != null) {

@@ -1,10 +1,13 @@
 package com.fm.jdbc.util;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class ApplicationProperties {
-    private String url;
-    private String username;
-    private String password;
+
+    @JsonProperty("jdbc")
+    private JdbcProperties jdbcProperties;
+
+    private String version;
 }
