@@ -13,12 +13,11 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <jackson.version>2.11.2</jackson.version>
+        <jackson.version>2.13.2</jackson.version>
     </properties>
 
     <modules>
         <module>jdbc</module>
     </modules>
-
 
 </project>
